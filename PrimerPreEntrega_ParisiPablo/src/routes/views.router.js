@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import ProductManager from '../managers/mongo/productManager.js';
+import passport from "passport";
 
 const router = Router();
 const productManager = new ProductManager();
@@ -35,5 +36,26 @@ router.get('/realtimeproducts', async (req, res) => {
     const products = await productManager.getAllProducts();
     res.render('realTimeProducts', { title: 'Real Time Products', css: 'realTimeProducts', products });
 });
+
+
+router.get('/register',(req,res)=>{
+    res.render('Register', { title: 'Register', css: 'Register'});
+})
+
+router.get('/login',(req,res)=>{
+    res.render('Login', { title: 'Login', css: 'Login'});
+})
+
+router.get('/profile',passport.authenticate('current',{session:false}),(req,res)=>{
+    console.log(req.user);
+    if(!req.user){
+        return res.redirect('/login')
+    }
+    res.render('Profile',{
+        title: 'Profile', 
+        css: 'Profile',
+        user: req.user
+    })
+})
 
 export default router;

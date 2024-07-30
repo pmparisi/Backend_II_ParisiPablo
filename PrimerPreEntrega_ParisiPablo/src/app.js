@@ -2,11 +2,17 @@ import express from 'express';
 import handlebars from 'express-handlebars';
 import { Server } from 'socket.io';
 import mongoose from 'mongoose';
+import passport from 'passport';
+import cookieParser from 'cookie-parser';
+
 import productsRouter from './routes/products.router.js';
 import cartsRouter from './routes/carts.router.js';
 import viewsRouter from './routes/views.router.js';
+import sessionRouter from './routes/session.router.js';
+
 import __dirname from './utils/utils.js';
 import ProductManager from './managers/mongo/productManager.js';
+import initializePassportConfig from './config/passport.config.js';
 
 console.log('__dirname:', __dirname);
 
@@ -52,10 +58,15 @@ app.set('view engine','handlebars');
 
 app.use(express.static(`${__dirname}/../public`));
 app.use(express.json());
+app.use(cookieParser());
+
+initializePassportConfig();
+app.use(passport.initialize());
 
 app.use('/',viewsRouter);
 app.use('/api/products',productsRouter);
 app.use('/api/carts',cartsRouter);
+app.use('/api/sessions', sessionRouter);
 
 app.use((req, res, next) => {
     res.status(404).render('404', { title: '404 Not Found',css: '404' });
